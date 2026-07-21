@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البكالوريا | المنصة التعليمية الذكية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'bounce-slight': 'bounceSlight 2s infinite',
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'pulse-border': 'pulseBorder 2s infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        bounceSlight: {
+                            '0%, 100%': { transform: 'translateY(-5%)' },
+                            '50%': { transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        pulseBorder: {
+                            '0%, 100%': { borderColor: 'rgba(99, 102, 241, 0.5)' },
+                            '50%': { borderColor: 'rgba(99, 102, 241, 1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        .tab-content { display: none; opacity: 0; }
+        .tab-content.active { display: block; animation: fadeInUp 0.4s ease-out forwards; }
+        ::-webkit-scrollbar { width: 8px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        #chatbot-window { transition: opacity 0.3s ease, transform 0.3s ease; transform-origin: bottom left; }
+        .chat-hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
+        .chat-visible { opacity: 1; transform: scale(1); pointer-events: all; }
+        html { scroll-behavior: smooth; }
+        .wizard-step { display: none; }
+        .wizard-step.active { display: block; animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+        <div class="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-lg shadow-brand-500/30">
+                    <i data-lucide="graduation-cap" class="h-6 w-6"></i>
+                </div>
+                <span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">البكالوريا</span>
+            </div>
+            
+            <nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-600 dark:text-slate-300">
+                <a href="#updates" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">نظام التقييم</a>
+                <a href="#guidance" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-indigo-600 dark:text-indigo-400">كيف تختار مسارك؟</a>
+                <a href="#tracks" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">المسارات والكليات</a>
+                <a href="#contact" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">تواصل معنا</a>
+            </nav>
+
+            <div class="flex items-center gap-2 md:gap-4">
+                <button id="theme-toggle" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <i id="theme-toggle-dark-icon" data-lucide="moon" class="h-5 w-5 hidden"></i>
+                    <i id="theme-toggle-light-icon" data-lucide="sun" class="h-5 w-5 hidden"></i>
+                </button>
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none">
+                    <i id="menu-icon-open" data-lucide="menu" class="h-6 w-6"></i>
+                    <i id="menu-icon-close" data-lucide="x" class="h-6 w-6 hidden"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden absolute top-16 left-0 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-lg">
+            <nav class="flex flex-col p-4 gap-4 text-base font-semibold text-slate-600 dark:text-slate-300">
+                <a href="#updates" onclick="toggleMobileMenu()" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">نظام التقييم</a>
+                <a href="#guidance" onclick="toggleMobileMenu()" class="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors">كيف تختار مسارك؟</a>
+                <a href="#tracks" onclick="toggleMobileMenu()" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">المسارات والكليات</a>
+                <a href="#contact" onclick="toggleMobileMenu()" class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">تواصل معنا</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-10 md:px-6 lg:py-16">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-16 animate-fade-in-up">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+                مستقبلك يبدأ من <span class="text-transparent bg-clip-text bg-gradient-to-l from-brand-600 to-blue-400">البكالوريا</span>
+            </h1>
+            <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                منصة متكاملة توفر لك أحدث البيانات الرسمية، إرشادات المناهج، الكليات المتاحة لكل مسار، ومساعد ذكي للإجابة على كافة استفساراتك.
+            </p>
+        </div>
+
+        <!-- Updates Section -->
+        <section id="updates" class="mb-20 animate-fade-in-up border-t border-slate-200 dark:border-slate-800 pt-16 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-8 justify-center">
+                <i data-lucide="info" class="h-8 w-8 text-brand-600"></i>
+                <h2 class="text-3xl font-bold">ملامح النظام التعليمي الجديد</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="bg-blue-100 dark:bg-blue-900/30 w-12 h-12 flex items-center justify-center rounded-lg mb-4 text-blue-600 dark:text-blue-400">
+                        <i data-lucide="calculator" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">التقييم التراكمي</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        لا يعتمد المجموع النهائي على امتحان واحد، بل يجمع بين تقييمات الفصلين الدراسيين، أعمال السنة، والمواظبة لضمان الانضباط المستمر.
+                    </p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="bg-emerald-100 dark:bg-emerald-900/30 w-12 h-12 flex items-center justify-center rounded-lg mb-4 text-emerald-600 dark:text-emerald-400">
+                        <i data-lucide="tablet" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">الامتحانات الإلكترونية</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        تجرى الامتحانات بنظام الكتاب المفتوح عبر الأجهزة اللوحية، مع التركيز على أسئلة قياس الفهم العميق ونواتج التعلم التطبيقية.
+                    </p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="bg-amber-100 dark:bg-amber-900/30 w-12 h-12 flex items-center justify-center rounded-lg mb-4 text-amber-600 dark:text-amber-400">
+                        <i data-lucide="trending-up" class="h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">التشعيب والمسارات</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        إلغاء التشعيب القديم واستبداله بـ 4 مسارات تخصصية دقيقة تبدأ من الصف الثاني الثانوي لتأهيل الطلاب للكليات وسوق العمل.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Combined Guidance & AI Wizard Section -->
+        <section id="guidance" class="mb-20 border-t border-slate-200 dark:border-slate-800 pt-16 scroll-mt-24">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold mb-4 text-indigo-600 dark:text-indigo-400 flex items-center justify-center gap-3">
+                    <i data-lucide="compass" class="h-8 w-8"></i> كيف تختار مسارك؟
+                </h2>
+                <p class="text-slate-600 dark:text-slate-400 text-lg max-w-3xl mx-auto">الجمع بين التحليل الذاتي الدقيق واستخدام التكنولوجيا يساعدك على اتخاذ القرار الأكاديمي الأهم في حياتك.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto items-start">
+                
+                <!-- Static Advice Panel (5 Cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-lg border border-slate-200 dark:border-slate-700">
+                        <h3 class="text-xl font-bold mb-6 flex items-center gap-3 text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-700 pb-4">
+                            <i data-lucide="list-checks" class="h-6 w-6 text-indigo-500"></i> خطوات التقييم الذاتي
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex gap-4 items-start group">
+                                <div class="flex-shrink-0 w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center font-bold transition-transform group-hover:scale-110">1</div>
+                                <div>
+                                    <h4 class="font-bold mb-1 text-slate-800 dark:text-slate-200">اكتشف شغفك الحقيقي</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">اختر المجال الذي يدفعك للتعلم المستمر، سواء كان الطب، الابتكار الهندسي، التجارة، أو الآداب.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-4 items-start group">
+                                <div class="flex-shrink-0 w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center font-bold transition-transform group-hover:scale-110">2</div>
+                                <div>
+                                    <h4 class="font-bold mb-1 text-slate-800 dark:text-slate-200">حلل درجاتك الأكاديمية</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">الشغف وحده لا يكفي. قارن بين تفوقك في الرياضيات والفيزياء مقابل الأحياء والكيمياء واللغات.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 items-start group">
+                                <div class="flex-shrink-0 w-10 h-10 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center font-bold transition-transform group-hover:scale-110">3</div>
+                                <div>
+                                    <h4 class="font-bold mb-1 text-slate-800 dark:text-slate-200">تخيل بيئة عملك المستقبلية</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">ابحث عن طبيعة وظائف الخريجين لكل مسار، وتأكد أنها تتناسب مع نمط الحياة الذي تطمح إليه.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 items-start group">
+                                <div class="flex-shrink-0 w-10 h-10 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl flex items-center justify-center font-bold transition-transform group-hover:scale-110">4</div>
+                                <div>
+                                    <h4 class="font-bold mb-1 text-slate-800 dark:text-slate-200">استشر الموجهين المتخصصين</h4>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400">تحدث دائماً مع معلميك والمرشد الأكاديمي، أو استخدم المساعد الذكي التفاعلي لتحليل ميولك بدقة.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Wizard Panel (7 Cols) -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-indigo-200 dark:border-indigo-800 flex flex-col h-full animate-pulse-border">
+                    <!-- Wizard Header -->
+                    <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-6 text-white flex justify-between items-center relative overflow-hidden">
+                        <i data-lucide="cpu" class="absolute -left-4 -bottom-4 h-24 w-24 opacity-10"></i>
+                        <div>
+                            <h3 class="font-bold text-xl flex items-center gap-2"><i data-lucide="bot" class="h-6 w-6"></i> المساعد الذكي للاختيار</h3>
+                            <p class="text-indigo-100 text-sm mt-1">أجب عن الأسئلة بدقة لتحديد المسار الأنسب</p>
+                        </div>
+                        <div class="bg-white/20 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm shadow-sm" id="step-counter">
+                            ١ / ٥
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="bg-slate-100 dark:bg-slate-900 h-1 w-full">
+                        <div id="wizard-progress" class="bg-indigo-500 h-1 transition-all duration-500" style="width: 20%"></div>
+                    </div>
+
+                    <!-- Wizard Body -->
+                    <div class="p-6 md:p-8 relative flex-grow flex flex-col justify-center bg-slate-50 dark:bg-slate-800/50">
+                        
+                        <div id="step-1" class="wizard-step active">
+                            <h3 class="text-xl font-bold mb-5 text-slate-800 dark:text-slate-100">١. في وقت فراغك، ما هو النشاط الأكثر متعة بالنسبة لك؟</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <button onclick="selectOption(1, 'medicine')" class="w-full text-right p-4 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-800 hover:bg-gradient-to-l hover:from-emerald-50 hover:to-white dark:hover:from-emerald-900/40 dark:hover:to-slate-800 shadow-sm hover:shadow transition-all font-semibold text-slate-700 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <div class="flex items-center gap-3 mb-2"><i data-lucide="leaf" class="text-emerald-500 h-5 w-5"></i></div>
+                                    <span class="text-sm">متابعة الاكتشافات العلمية، الطبيعة، والأحياء.</span>
+                                </button>
+                                <button onclick="selectOption(1, 'engineering')" class="w-full text-right p-4 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 hover:bg-gradient-to-l hover:from-blue-50 hover:to-white dark:hover:from-blue-900/40 dark:hover:to-slate-800 shadow-sm hover:shadow transition-all font-semibold text-slate-700 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <div class="flex items-center gap-3 mb-2"><i data-lucide="wrench" class="text-blue-500 h-5 w-5"></i></div>
+                                    <span class="text-sm">فك وتركيب الأجهزة، تعلم البرمجة، والتصميم.</span>
+                                </button>
+                                <button onclick="selectOption(1, 'business')" class="w-full text-right p-4 rounded-xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-800 hover:bg-gradient-to-l hover:from-amber-50 hover:to-white dark:hover:from-amber-900/40 dark:hover:to-slate-800 shadow-sm hover:shadow transition-all font-semibold text-slate-700 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <div class="flex items-center gap-3 mb-2"><i data-lucide="briefcase" class="text-amber-500 h-5 w-5"></i></div>
+                                    <span class="text-sm">متابعة الأسواق المالية والتخطيط للمشاريع.</span>
+                                </button>
+                                <button onclick="selectOption(1, 'arts')" class="w-full text-right p-4 rounded-xl border border-rose-200 dark:border-rose-800 bg-white dark:bg-slate-800 hover:bg-gradient-to-l hover:from-rose-50 hover:to-white dark:hover:from-rose-900/40 dark:hover:to-slate-800 shadow-sm hover:shadow transition-all font-semibold text-slate-700 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <div class="flex items-center gap-3 mb-2"><i data-lucide="book" class="text-rose-500 h-5 w-5"></i></div>
+                                    <span class="text-sm">قراءة الروايات، تعلم اللغات، ومتابعة الفنون.</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step-2" class="wizard-step">
+                            <h3 class="text-xl font-bold mb-5 text-slate-800 dark:text-slate-100">٢. في الصف الأول الثانوي، ما هي المواد التي تحقق فيها أعلى تفوق؟</h3>
+                            <div class="grid grid-cols-1 gap-3">
+                                <button onclick="selectOption(2, 'engineering')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>الرياضيات البحتة، الفيزياء، والبرمجة.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                                <button onclick="selectOption(2, 'medicine')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>الأحياء، الكيمياء، والعلوم الحيوية.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                                <button onclick="selectOption(2, 'arts')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>اللغة العربية، اللغات الأجنبية، والتاريخ.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                                <button onclick="selectOption(2, 'business')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>المهارات الحسابية التطبيقية والقدرة على الفهم المتوازن.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step-3" class="wizard-step">
+                            <h3 class="text-xl font-bold mb-5 text-slate-800 dark:text-slate-100">٣. كيف تفضل أن تكون بيئة عملك المستقبلية؟</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <button onclick="selectOption(3, 'medicine')" class="w-full text-right p-4 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-all font-semibold text-emerald-800 dark:text-emerald-200 active:scale-95">
+                                    العمل في المستشفيات، العيادات، ومعامل الأبحاث.
+                                </button>
+                                <button onclick="selectOption(3, 'business')" class="w-full text-right p-4 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all font-semibold text-amber-800 dark:text-amber-200 active:scale-95">
+                                    المؤسسات المالية، الشركات الكبرى، وريادة الأعمال.
+                                </button>
+                                <button onclick="selectOption(3, 'engineering')" class="w-full text-right p-4 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all font-semibold text-blue-800 dark:text-blue-200 active:scale-95">
+                                    مكاتب الهندسة المعمارية، شركات البرمجيات، والمصانع.
+                                </button>
+                                <button onclick="selectOption(3, 'arts')" class="w-full text-right p-4 rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all font-semibold text-rose-800 dark:text-rose-200 active:scale-95">
+                                    الوكالات الإعلامية، دور النشر، الهيئات الدبلوماسية.
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step-4" class="wizard-step">
+                            <h3 class="text-xl font-bold mb-5 text-slate-800 dark:text-slate-100">٤. عند مواجهة مشكلة معقدة، ما هو أسلوبك المفضل لحلها؟</h3>
+                            <div class="space-y-3">
+                                <button onclick="selectOption(4, 'engineering')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>تحليلها منطقياً واستخدام الأرقام والمعادلات لإيجاد حل جذري.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                                <button onclick="selectOption(4, 'arts')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>التفكير الإبداعي والتواصل مع الآخرين للوصول لتسوية.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                                <button onclick="selectOption(4, 'medicine')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>تشخيص المسببات بعناية والمقارنة مع التجارب السابقة.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                                <button onclick="selectOption(4, 'business')" class="w-full text-right p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 hover:shadow-md transition-all font-semibold text-slate-700 dark:text-slate-200 flex justify-between items-center group active:scale-95">
+                                    <span>حساب التكلفة والعائد، والتخطيط لتقليل المخاطر وزيادة المكاسب.</span>
+                                    <i data-lucide="arrow-left" class="h-5 w-5 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-x-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step-5" class="wizard-step">
+                            <h3 class="text-xl font-bold mb-5 text-slate-800 dark:text-slate-100">٥. أخيراً، ما هو طموحك الأسمى للمستقبل؟</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <button onclick="selectOption(5, 'engineering')" class="w-full text-center p-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-br from-white to-blue-50 dark:from-slate-800 dark:to-blue-900/20 hover:shadow-lg transition-all font-semibold text-slate-800 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <i data-lucide="cpu" class="h-8 w-8 mx-auto mb-3 text-blue-500"></i>
+                                    تصميم التكنولوجيا والبنى التحتية
+                                </button>
+                                <button onclick="selectOption(5, 'medicine')" class="w-full text-center p-6 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-white to-emerald-50 dark:from-slate-800 dark:to-emerald-900/20 hover:shadow-lg transition-all font-semibold text-slate-800 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <i data-lucide="heart-pulse" class="h-8 w-8 mx-auto mb-3 text-emerald-500"></i>
+                                    المساهمة في العلاج والبحث العلمي
+                                </button>
+                                <button onclick="selectOption(5, 'business')" class="w-full text-center p-6 rounded-xl border border-amber-200 dark:border-amber-800 bg-gradient-to-br from-white to-amber-50 dark:from-slate-800 dark:to-amber-900/20 hover:shadow-lg transition-all font-semibold text-slate-800 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <i data-lucide="pie-chart" class="h-8 w-8 mx-auto mb-3 text-amber-500"></i>
+                                    إدارة الأعمال ونمو الاقتصاد
+                                </button>
+                                <button onclick="selectOption(5, 'arts')" class="w-full text-center p-6 rounded-xl border border-rose-200 dark:border-rose-800 bg-gradient-to-br from-white to-rose-50 dark:from-slate-800 dark:to-rose-900/20 hover:shadow-lg transition-all font-semibold text-slate-800 dark:text-slate-200 transform hover:-translate-y-1 active:scale-95">
+                                    <i data-lucide="mic" class="h-8 w-8 mx-auto mb-3 text-rose-500"></i>
+                                    التأثير الإعلامي والمجتمعي
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Result Step -->
+                        <div id="step-result" class="wizard-step text-center">
+                            <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 mb-6 border-4 border-white dark:border-slate-800 shadow-xl animate-bounce-slight">
+                                <i data-lucide="sparkles" class="h-10 w-10"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-slate-800 dark:text-slate-100">تحليل المساعد الذكي</h3>
+                            
+                            <div id="wizard-result-box" class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-6 rounded-2xl shadow-lg inline-block w-full max-w-md mx-auto mb-8">
+                                <p class="text-indigo-100 text-sm mb-2">المسار الأكاديمي الموصى به لك هو:</p>
+                                <h4 id="wizard-recommended-track" class="text-3xl font-bold mb-4">اسم المسار</h4>
+                                <p id="wizard-reasoning" class="text-indigo-50 text-sm leading-relaxed border-t border-indigo-400/50 pt-4">التبرير سيظهر هنا بناءً على الإجابات.</p>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                                <button onclick="document.getElementById('tracks').scrollIntoView();" class="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold shadow-md hover:shadow-lg transition-all active:scale-95">تصفح مواد المسار</button>
+                                <button onclick="resetWizard()" class="px-6 py-3 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-all active:scale-95 flex justify-center items-center gap-2">
+                                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i> إعادة الاختبار
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tracks Section -->
+        <section id="tracks" class="mb-20 border-t border-slate-200 dark:border-slate-800 pt-16 scroll-mt-24">
+            <div class="text-center mb-10 px-4">
+                <h2 class="text-3xl font-bold mb-4">الدليل الشامل للمسارات والكليات المتاحة</h2>
+                <p class="text-slate-600 dark:text-slate-400">اختر مسارك لمعرفة المواد الدراسية والكليات الجامعية التي يؤهلك للالتحاق بها.</p>
+            </div>
+
+            <div class="flex flex-nowrap md:flex-wrap overflow-x-auto md:overflow-visible justify-start md:justify-center gap-3 mb-8 max-w-6xl mx-auto pb-4 px-4 scrollbar-hide snap-x">
+                <button onclick="switchTab('grade10', this)" class="tab-btn active bg-brand-600 text-white shadow-md hover:bg-brand-700 border border-brand-600 px-5 py-3 rounded-xl font-bold transition-all whitespace-nowrap snap-center shrink-0">
+                    الصف الأول الثانوي
+                </button>
+                <button onclick="switchTab('medicine-track', this)" class="tab-btn bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap snap-center shrink-0">
+                    الطب وعلوم الحياة
+                </button>
+                <button onclick="switchTab('engineering-track', this)" class="tab-btn bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap snap-center shrink-0">
+                    الهندسة وعلوم الحاسب
+                </button>
+                <button onclick="switchTab('business-track', this)" class="tab-btn bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap snap-center shrink-0">
+                    الأعمال
+                </button>
+                <button onclick="switchTab('arts-track', this)" class="tab-btn bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap snap-center shrink-0">
+                    الآداب والفنون
+                </button>
+            </div>
+
+            <div class="max-w-5xl mx-auto px-4 md:px-0">
+                
+                <div id="grade10" class="tab-content active">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 md:p-8 text-center">
+                        <h3 class="text-2xl font-bold mb-6">المواد الأساسية للصف الأول الثانوي (7 مواد)</h3>
+                        <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">هذا الصف هو مرحلة تأسيسية شاملة، تساعدك دراسة هذه المواد المتنوعة على اكتشاف نقاط قوتك وميولك قبل تحديد مسارك في الصف الثاني.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl font-bold shadow-sm">التربية الدينية</div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl font-bold shadow-sm">اللغة العربية</div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl font-bold shadow-sm">اللغة الإنجليزية</div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl font-bold shadow-sm">الرياضيات</div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl font-bold shadow-sm">الفلسفة والمنطق</div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl font-bold shadow-sm">التاريخ المصري</div>
+                            <div class="p-4 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800 rounded-xl font-bold col-span-2 shadow-sm">العلوم المتكاملة</div>
+                        </div>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">بالإضافة إلى مواد خارج المجموع: برمجة، علوم الحاسب، اللغة الأجنبية الثانية.</p>
+                    </div>
+                </div>
+
+                <div id="medicine-track" class="tab-content">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border-t-4 border-emerald-500 p-6 md:p-8">
+                        <div class="grid md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-emerald-600 dark:text-emerald-400">مقررات الصف الثاني (٤ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 flex items-center justify-center text-xs shrink-0">1</span> اللغة العربية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 flex items-center justify-center text-xs shrink-0">2</span> اللغة الإنجليزية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 flex items-center justify-center text-xs shrink-0">3</span> التاريخ المصري</li>
+                                    <li class="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shrink-0">4</span> الرياضيات <span class="text-emerald-600 mx-1">أو</span> الفيزياء</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-emerald-600 dark:text-emerald-400">مقررات الصف الثالث (٣ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">1</span> التربية الدينية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">2</span> الأحياء (مستوى رفيع)</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">3</span> الكيمياء (مستوى رفيع)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-emerald-100 dark:border-emerald-800/50">
+                            <h4 class="font-bold text-lg mb-4 text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                                <i data-lucide="building-2" class="h-5 w-5"></i> الكليات المتاحة لخريجي هذا المسار
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">الطب البشري</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">طب الأسنان</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">الصيدلة</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">العلاج الطبيعي</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">الطب البيطري</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">التمريض</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">العلوم (أقسام البيولوجي)</span>
+                                <span class="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold shadow-sm">الزراعة</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="engineering-track" class="tab-content">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border-t-4 border-blue-500 p-6 md:p-8">
+                        <div class="grid md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-blue-600 dark:text-blue-400">مقررات الصف الثاني (٤ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 flex items-center justify-center text-xs shrink-0">1</span> اللغة العربية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 flex items-center justify-center text-xs shrink-0">2</span> اللغة الإنجليزية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 flex items-center justify-center text-xs shrink-0">3</span> التاريخ المصري</li>
+                                    <li class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shrink-0">4</span> الكيمياء <span class="text-blue-600 mx-1">أو</span> البرمجة</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-blue-600 dark:text-blue-400">مقررات الصف الثالث (٣ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">1</span> التربية الدينية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">2</span> رياضيات (مستوى رفيع)</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">3</span> فيزياء (مستوى رفيع)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-blue-100 dark:border-blue-800/50">
+                            <h4 class="font-bold text-lg mb-4 text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                                <i data-lucide="building-2" class="h-5 w-5"></i> الكليات المتاحة لخريجي هذا المسار
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">الهندسة (بكافة أقسامها)</span>
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">حاسبات ومعلومات</span>
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">الذكاء الاصطناعي</span>
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">التخطيط العمراني</span>
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">الفنون الجميلة (قسم عمارة)</span>
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">العلوم (رياضيات وفيزياء)</span>
+                                <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm font-bold shadow-sm">الملاحة وتكنولوجيا الفضاء</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="business-track" class="tab-content">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border-t-4 border-amber-500 p-6 md:p-8">
+                        <div class="grid md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-amber-600 dark:text-amber-400">مقررات الصف الثاني (٤ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-600 flex items-center justify-center text-xs shrink-0">1</span> اللغة العربية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-600 flex items-center justify-center text-xs shrink-0">2</span> اللغة الإنجليزية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-600 flex items-center justify-center text-xs shrink-0">3</span> التاريخ المصري</li>
+                                    <li class="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-lg border border-amber-200 dark:border-amber-800 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs shrink-0">4</span> محاسبة <span class="text-amber-600 mx-1">أو</span> إدارة أعمال</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-amber-600 dark:text-amber-400">مقررات الصف الثالث (٣ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">1</span> التربية الدينية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">2</span> اقتصاد (مستوى رفيع)</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">3</span> الرياضيات</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-amber-100 dark:border-amber-800/50">
+                            <h4 class="font-bold text-lg mb-4 text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                                <i data-lucide="building-2" class="h-5 w-5"></i> الكليات المتاحة لخريجي هذا المسار
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-sm font-bold shadow-sm">كلية التجارة (عربي/إنجليزي/BIS)</span>
+                                <span class="px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-sm font-bold shadow-sm">إدارة الأعمال</span>
+                                <span class="px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-sm font-bold shadow-sm">الاقتصاد والعلوم السياسية</span>
+                                <span class="px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-sm font-bold shadow-sm">نظم المعلومات الإدارية (MIS)</span>
+                                <span class="px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-sm font-bold shadow-sm">تكنولوجيا الإدارة</span>
+                                <span class="px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg text-sm font-bold shadow-sm">السياحة والفنادق (أقسام الإدارة)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="arts-track" class="tab-content">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border-t-4 border-rose-500 p-6 md:p-8">
+                        <div class="grid md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-rose-600 dark:text-rose-400">مقررات الصف الثاني (٤ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900 text-rose-600 flex items-center justify-center text-xs shrink-0">1</span> اللغة العربية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900 text-rose-600 flex items-center justify-center text-xs shrink-0">2</span> اللغة الإنجليزية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900 text-rose-600 flex items-center justify-center text-xs shrink-0">3</span> التاريخ المصري</li>
+                                    <li class="bg-rose-50 dark:bg-rose-900/30 p-3 rounded-lg border border-rose-200 dark:border-rose-800 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs shrink-0">4</span> علم نفس <span class="text-rose-600 mx-1">أو</span> لغة أجنبية ثانية</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-4 text-rose-600 dark:text-rose-400">مقررات الصف الثالث (٣ مواد)</h4>
+                                <ul class="space-y-3 font-semibold text-slate-800 dark:text-slate-200">
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">1</span> التربية الدينية</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">2</span> جغرافيا (مستوى رفيع)</li>
+                                    <li class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg border border-slate-100 dark:border-slate-600 shadow-sm flex items-center gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs shrink-0">3</span> الإحصاء</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-rose-100 dark:border-rose-800/50">
+                            <h4 class="font-bold text-lg mb-4 text-rose-700 dark:text-rose-400 flex items-center gap-2">
+                                <i data-lucide="building-2" class="h-5 w-5"></i> الكليات المتاحة لخريجي هذا المسار
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">كلية الآداب (بكافة أقسامها)</span>
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">الألسن واللغات والترجمة</span>
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">الإعلام والاتصال الجماهيري</span>
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">الحقوق والدراسات القانونية</span>
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">كلية التربية</span>
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">الفنون الجميلة (فنون)</span>
+                                <span class="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-sm font-bold shadow-sm">دار العلوم</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact Us Form -->
+        <section id="contact" class="max-w-4xl mx-auto mb-10 border-t border-slate-200 dark:border-slate-800 pt-16 scroll-mt-24 px-4 md:px-0">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row">
+                <div class="md:w-2/5 bg-brand-600 text-white p-8 md:p-10 flex flex-col justify-center">
+                    <h3 class="text-3xl font-bold mb-4">هل لديك استفسار؟</h3>
+                    <p class="text-brand-100 mb-8 text-sm leading-relaxed">
+                        فريق الدعم الفني والأكاديمي في البكالوريا متواجد للرد على كافة أسئلتك بخصوص النظام الجديد والتسجيل في المنصة.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="mail" class="h-5 w-5 text-brand-200"></i>
+                            <span class="text-sm">support@elbakaloria.com</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="phone" class="h-5 w-5 text-brand-200"></i>
+                            <span class="text-sm">+20 123 456 7890</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:w-3/5 p-8 md:p-10">
+                    <form onsubmit="submitForm(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">الاسم بالكامل</label>
+                                <input type="text" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">البريد الإلكتروني</label>
+                                <input type="email" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">نوع المستخدم</label>
+                            <select class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none">
+                                <option>طالب</option>
+                                <option>ولي أمر</option>
+                                <option>معلم</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">رسالتك</label>
+                            <textarea rows="4" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-slate-900 dark:bg-brand-600 hover:bg-slate-800 dark:hover:bg-brand-500 text-white font-bold py-3 rounded-lg transition-colors flex justify-center items-center gap-2">
+                            <span>إرسال الرسالة</span>
+                            <i data-lucide="send" class="h-4 w-4"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- AI Chatbot Interactive Widget -->
+    <div class="fixed bottom-6 left-6 z-50 flex flex-col items-start">
+        
+        <!-- Chat Window -->
+        <div id="chatbot-window" class="chat-hidden mb-4 bg-white dark:bg-slate-800 w-80 sm:w-96 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col h-[400px]">
+            <div class="bg-gradient-to-l from-brand-600 to-blue-500 p-4 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="bg-white/20 p-1.5 rounded-full"><i data-lucide="bot" class="h-5 w-5"></i></div>
+                    <span class="font-bold">مساعد البكالوريا الذكي</span>
+                </div>
+                <button onclick="toggleChat()" class="hover:bg-white/20 p-1 rounded-full transition-colors">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+            
+            <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50 dark:bg-slate-900/50 space-y-4 text-sm">
+                <div class="flex items-start gap-2">
+                    <div class="bg-brand-100 dark:bg-brand-900/30 text-slate-800 dark:text-slate-200 p-3 rounded-2xl rounded-tr-none border border-brand-200 dark:border-brand-800 max-w-[85%]">
+                        مرحباً! أنا المساعد الذكي الخاص بمنصة البكالوريا. يمكنك سؤالي عن تفاصيل المسارات أو الكليات المتاحة لك.
+                    </div>
+                </div>
+            </div>
+            
+            <form onsubmit="handleAIChat(event)" class="p-3 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex gap-2">
+                <input id="chat-input" type="text" placeholder="اكتب سؤالك هنا..." class="flex-grow bg-slate-100 dark:bg-slate-900 border-none rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm">
+                <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white h-10 w-10 rounded-full flex items-center justify-center transition-colors">
+                    <i data-lucide="send-horizonal" class="h-4 w-4 rtl:rotate-180"></i>
+                </button>
+            </form>
+        </div>
+
+        <button onclick="toggleChat()" class="animate-bounce-slight bg-brand-600 hover:bg-brand-700 text-white h-14 w-14 rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-brand-500/30">
+            <i data-lucide="message-square-text" class="h-6 w-6"></i>
+        </button>
+    </div>
+
+    <!-- Interactive Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // Dark/Light Mode Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            lightIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            darkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            darkIcon.classList.toggle('hidden');
+            lightIcon.classList.toggle('hidden');
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        });
+
+        // Mobile Menu Toggle Logic
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const iconOpen = document.getElementById('menu-icon-open');
+            const iconClose = document.getElementById('menu-icon-close');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                iconOpen.classList.add('hidden');
+                iconClose.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+                iconOpen.classList.remove('hidden');
+                iconClose.classList.add('hidden');
+            }
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId, buttonElement) {
+            document.querySelectorAll('#tracks .tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('#tracks .tab-btn').forEach(btn => {
+                btn.className = 'tab-btn bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap snap-center shrink-0';
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            if(buttonElement) {
+                buttonElement.className = 'tab-btn bg-brand-600 text-white shadow-md hover:bg-brand-700 border border-brand-600 px-5 py-3 rounded-xl font-bold transition-all whitespace-nowrap snap-center shrink-0';
+                buttonElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        // Contact Form Submission 
+        function submitForm(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span>تم الإرسال بنجاح!</span> <i data-lucide="check-circle" class="h-4 w-4"></i>';
+            btn.classList.replace('bg-slate-900', 'bg-emerald-600');
+            btn.classList.replace('dark:bg-brand-600', 'dark:bg-emerald-600');
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.classList.replace('bg-emerald-600', 'bg-slate-900');
+                btn.classList.replace('dark:bg-emerald-600', 'dark:bg-brand-600');
+                e.target.reset();
+                lucide.createIcons();
+            }, 3000);
+        }
+
+        // AI Chatbot Logic
+        const chatWindow = document.getElementById('chatbot-window');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        
+        function toggleChat() {
+            if (chatWindow.classList.contains('chat-hidden')) {
+                chatWindow.classList.remove('chat-hidden');
+                chatWindow.classList.add('chat-visible');
+                setTimeout(() => chatInput.focus(), 300);
+            } else {
+                chatWindow.classList.remove('chat-visible');
+                chatWindow.classList.add('chat-hidden');
+            }
+        }
+
+        function appendMessage(text, isUser = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start gap-2 ${isUser ? 'flex-row-reverse' : ''}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = isUser 
+                ? 'bg-slate-800 dark:bg-slate-700 text-white p-3 rounded-2xl rounded-tl-none max-w-[85%]'
+                : 'bg-brand-100 dark:bg-brand-900/30 text-slate-800 dark:text-slate-200 p-3 rounded-2xl rounded-tr-none border border-brand-200 dark:border-brand-800 max-w-[85%]';
+            bubble.textContent = text;
+            
+            msgDiv.appendChild(bubble);
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleAIChat(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, true);
+            chatInput.value = '';
+
+            setTimeout(() => {
+                const aiResponses = [
+                    "سؤال ممتاز. لضمان التحاقك بكلية الهندسة أو الحاسبات، يجب عليك اختيار مسار الهندسة وعلوم الحاسب في الصف الثاني الثانوي.",
+                    "بناءً على التحديثات الأخيرة، يتيح مسار الأعمال الالتحاق بكليات التجارة والاقتصاد والعلوم السياسية.",
+                    "يمكنك تجربة اختبار المساعد الذكي في قسم 'كيف تختار مسارك؟' لمعرفة المعايير الأكاديمية لاختيار التخصص."
+                ];
+                const response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                appendMessage(response, false);
+            }, 1000);
+        }
+
+        // -----------------------------
+        // AI Wizard Logic 
+        // -----------------------------
+        let wizardScores = { medicine: 0, engineering: 0, business: 0, arts: 0 };
+        let currentWizardStep = 1;
+        const totalSteps = 5;
+
+        function selectOption(step, track) {
+            wizardScores[track] += 1;
+            document.getElementById(`step-${step}`).classList.remove('active');
+            
+            if(step < totalSteps) {
+                currentWizardStep++;
+                document.getElementById(`step-${currentWizardStep}`).classList.add('active');
+                
+                // Update Progress and Counter
+                const progressPercentage = (currentWizardStep / totalSteps) * 100;
+                document.getElementById('wizard-progress').style.width = `${progressPercentage}%`;
+                
+                // Translate numbers to Arabic numerals visually
+                const arabicNumerals = ['١', '٢', '٣', '٤', '٥'];
+                document.getElementById('step-counter').textContent = `${arabicNumerals[currentWizardStep-1]} / ٥`;
+            } else {
+                document.getElementById('wizard-progress').style.width = `100%`;
+                document.getElementById('step-counter').textContent = `اكتمل`;
+                calculateWizardResult();
+            }
+        }
+
+        function calculateWizardResult() {
+            let maxScore = -1;
+            let recommendedTrack = '';
+            
+            for(const [track, score] of Object.entries(wizardScores)) {
+                if(score > maxScore) {
+                    maxScore = score;
+                    recommendedTrack = track;
+                }
+            }
+
+            const trackNameEl = document.getElementById('wizard-recommended-track');
+            const reasoningEl = document.getElementById('wizard-reasoning');
+
+            switch(recommendedTrack) {
+                case 'medicine':
+                    trackNameEl.textContent = 'مسار الطب وعلوم الحياة';
+                    reasoningEl.textContent = 'شغفك بالعلوم ورغبتك في بيئة العمل الطبية والبحثية تجعل هذا المسار هو الأفضل لضمان مستقبل مشرق في الكليات الطبية والبيولوجية.';
+                    break;
+                case 'engineering':
+                    trackNameEl.textContent = 'مسار الهندسة وعلوم الحاسب';
+                    reasoningEl.textContent = 'تفكيرك المنطقي واهتمامك بالتكنولوجيا وحل المشكلات المعقدة يشير بقوة إلى أنك ستتميز وتبدع في المجالات الهندسية والبرمجية.';
+                    break;
+                case 'business':
+                    trackNameEl.textContent = 'مسار الأعمال';
+                    reasoningEl.textContent = 'شخصيتك القيادية واهتمامك بالأسواق والإدارة وتوظيف الموارد يشير إلى قدرتك الكبيرة على تحقيق النجاح في عالم المال والأعمال.';
+                    break;
+                case 'arts':
+                    trackNameEl.textContent = 'مسار الآداب والفنون';
+                    reasoningEl.textContent = 'ميولك الإبداعية وقدراتك المتميزة في اللغات والتواصل تجعلك المرشح المثالي للتأثير في المجتمعات عبر كليات الإعلام، الألسن، أو الآداب.';
+                    break;
+            }
+
+            document.getElementById('step-result').classList.add('active');
+        }
+
+        function resetWizard() {
+            wizardScores = { medicine: 0, engineering: 0, business: 0, arts: 0 };
+            currentWizardStep = 1;
+            
+            document.getElementById('step-result').classList.remove('active');
+            document.getElementById('step-1').classList.add('active');
+            document.getElementById('wizard-progress').style.width = `20%`;
+            document.getElementById('step-counter').textContent = `١ / ٥`;
+        }
+    </script>
+</body>
+</html>
