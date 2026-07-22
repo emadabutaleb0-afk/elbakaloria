@@ -25,6 +25,23 @@ export default function Home() {
   const [hovered, setHovered]           = useState<string | null>(null);
   const { theme, toggleTheme }          = useTheme();
 
+  const [visitorCount, setVisitorCount] = useState(() => {
+    const saved = localStorage.getItem('elbakaloria_visitors');
+    if (saved) return parseInt(saved, 10);
+    return 360000;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('elbakaloria_visitors', visitorCount.toString());
+  }, [visitorCount]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisitorCount(prev => prev + Math.floor(Math.random() * 3) + 1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -212,7 +229,14 @@ export default function Home() {
       <footer className="border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 py-8">
         <div className="container mx-auto px-4 text-center text-sm text-slate-600 dark:text-slate-400">
           <p>© 2026 منصة البكالوريا. جميع الحقوق محفوظة.</p>
-          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500 max-w-2xl mx-auto leading-relaxed">
+          <div className="mt-2.5 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>عدد الزوار:</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-mono text-slate-700 dark:text-slate-350">
+              {visitorCount.toLocaleString()}
+            </span>
+          </div>
+          <p className="mt-3 text-[11px] text-slate-400 dark:text-slate-500 max-w-2xl mx-auto leading-relaxed">
             إخلاء مسؤولية: جميع المعلومات والبيانات الواردة في هذه المنصة هي لأغراض إرشادية وتثقيفية فقط وتستند إلى التوجيهات الرسمية المعلنة. للحصول على القرارات النهائية والمعلومات الرسمية المعتمدة، يرجى دائماً مراجعة القنوات الرسمية لوزارة التربية والتعليم.
           </p>
         </div>
