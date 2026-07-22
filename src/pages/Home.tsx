@@ -27,10 +27,8 @@ export default function Home() {
 
   const [visitorCount, setVisitorCount] = useState(() => {
     const saved = localStorage.getItem('elbakaloria_visitors');
-    // Reset from the simulated high count (360k) to a logical local page view count
-    const initial = saved ? parseInt(saved, 10) : 0;
-    const finalCount = initial > 100000 ? 1 : initial;
-    return finalCount + 1;
+    const initial = saved ? parseInt(saved, 10) : 120000;
+    return initial + 1;
   });
 
   useEffect(() => {
