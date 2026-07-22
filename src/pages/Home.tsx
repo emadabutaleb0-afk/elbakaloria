@@ -27,8 +27,8 @@ export default function Home() {
 
   const [visitorCount, setVisitorCount] = useState(() => {
     const saved = localStorage.getItem('elbakaloria_visitors');
-    const initial = saved ? parseInt(saved, 10) : 120000;
-    return initial + 1;
+    const initial = saved ? parseInt(saved, 10) : 0;
+    return Math.max(initial, 120000) + 1;
   });
 
   useEffect(() => {
