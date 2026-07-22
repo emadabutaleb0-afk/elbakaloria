@@ -62,10 +62,7 @@ export default function ContactSection() {
                 <span className="text-2xl group-hover:scale-110 transition-transform">✉️</span>
                 <span className="text-sm font-medium">{SUPPORT_EMAIL}</span>
               </a>
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📞</span>
-                <span className="text-sm">+20 123 456 7890</span>
-              </div>
+
               <div className="flex items-center gap-3">
                 <span className="text-2xl">📍</span>
                 <span className="text-sm">{'\u0627\u0644\u0642\u0627\u0647\u0631\u0629\u060c \u0645\u0635\u0631'}</span>
