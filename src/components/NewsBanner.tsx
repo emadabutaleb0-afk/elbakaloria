@@ -139,24 +139,49 @@ export default function NewsBanner() {
       <div className={`h-0.5 w-full bg-gradient-to-l ${cfg.bar} transition-all duration-700`} />
 
       <div className="container mx-auto px-4">
-        <div className="flex items-center gap-3 h-11">
-
-          {/* Icon + Badge */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${cfg.badge}`}>
-              <Icon className="w-3 h-3" />
-              <span>{news.tag}</span>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 py-2 md:py-0 md:h-11">
+          <div className="flex items-center justify-between md:justify-start gap-3 w-full md:w-auto">
+            {/* Icon + Badge */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${cfg.badge}`}>
+                <Icon className="w-3 h-3" />
+                <span>{news.tag}</span>
+              </div>
+            </div>
+            {/* Mobile Controls (Next/Prev/Dismiss) */}
+            <div className="flex md:hidden items-center gap-1 flex-shrink-0">
+              <button
+                onClick={() => goTo('prev')}
+                className="p-1 rounded-md text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 transition-all"
+                aria-label="السابق"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => goTo('next')}
+                className="p-1 rounded-md text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 transition-all"
+                aria-label="التالي"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setDismissed(true)}
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                aria-label="إغلاق"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 flex-shrink-0" />
+          <div className="hidden md:block w-px h-4 bg-slate-300 dark:bg-slate-600 flex-shrink-0" />
 
           {/* Message — animated slide */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 w-full overflow-hidden">
             <div
               key={currentIndex}
-              className={`flex items-center gap-3 transition-all duration-300 ${
+              className={`flex flex-wrap md:flex-nowrap items-center gap-x-2 gap-y-1 transition-all duration-300 ${
                 animating
                   ? direction === 'next'
                     ? 'opacity-0 -translate-y-2'
@@ -164,7 +189,7 @@ export default function NewsBanner() {
                   : 'opacity-100 translate-y-0'
               }`}
             >
-              <p className="text-sm text-slate-700 dark:text-slate-300 truncate leading-none">
+              <p className="text-[13px] md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed md:leading-none">
                 {news.message}
               </p>
               {news.link && (
@@ -173,14 +198,14 @@ export default function NewsBanner() {
                   className={`text-xs font-bold flex-shrink-0 flex items-center gap-0.5 transition-colors ${cfg.link}`}
                 >
                   {news.linkText}
-                  <ChevronLeft className="w-3 h-3" />
+                  <ChevronLeft className="w-3.5 h-3.5" />
                 </a>
               )}
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Desktop Controls */}
+          <div className="hidden md:flex items-center gap-1 flex-shrink-0">
             {/* Dots */}
             <div className="hidden sm:flex items-center gap-1 ml-1">
               {NEWS_ITEMS.map((_, i) => (

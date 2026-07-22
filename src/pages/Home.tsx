@@ -27,20 +27,15 @@ export default function Home() {
 
   const [visitorCount, setVisitorCount] = useState(() => {
     const saved = localStorage.getItem('elbakaloria_visitors');
-    if (saved) return parseInt(saved, 10);
-    return 360000;
+    // Reset from the simulated high count (360k) to a logical local page view count
+    const initial = saved ? parseInt(saved, 10) : 0;
+    const finalCount = initial > 100000 ? 1 : initial;
+    return finalCount + 1;
   });
 
   useEffect(() => {
     localStorage.setItem('elbakaloria_visitors', visitorCount.toString());
   }, [visitorCount]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setVisitorCount(prev => prev + Math.floor(Math.random() * 3) + 1);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
